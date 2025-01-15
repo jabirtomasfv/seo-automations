@@ -9,46 +9,68 @@ def index_api(request_id, response, exception):
     else:
         st.success(f"URL processed: {response['urlNotificationMetadata']['url']}")
 
-def main():
-    st.title("Google Indexing API - Bulk URL Submission")
+def get_notification_status(service, urls):
+    statuses = []
+    for url in urls:
+        try:
+            response = service.urlNotifications().getMetadata(url=url).execute()
+            statuses.append((url, response['latestUpdate']['type'], response['latestUpdate']['notifyTime']))
+        except Exception as e:
+            statuses.append((url, "Error", str(e)))
+    return statuses
 
-    # File uploader for JSON key
+def main():
+    st.title("Google Indexing API - Bulk URL Operations")
+
     json_key = st.file_uploader("Upload your service account JSON key file", type="json")
 
-    # File uploader for URLs
-    url_file = st.file_uploader("Upload a file with URLs (one per line)", type="txt")
+    tab1, tab2 = st.tabs(["Submit URLs", "Check Status"])
 
-    # Request type selection
-    request_type = st.radio("Select request type:", ("URL_UPDATED", "URL_DELETED"))
+    with tab1:
+        url_file = st.file_uploader("Upload a file with URLs (one per line)", type="txt")
+        request_type = st.radio("Select request type:", ("URL_UPDATED", "URL_DELETED"))
 
-    if json_key and url_file:
-        # Read JSON key
-        json_key_content = json.load(json_key)
+        if json_key and url_file:
+            json_key_content = json.load(json_key)
+            urls = [line.decode('utf-8').strip() for line in url_file]
+            requests = {url: request_type for url in urls}
 
-        # Read URLs
-        urls = [line.decode('utf-8').strip() for line in url_file]
+            credentials = service_account.Credentials.from_service_account_info(
+                json_key_content, scopes=["https://www.googleapis.com/auth/indexing"])
+            service = build('indexing', 'v3', credentials=credentials)
 
-        # Create requests dictionary
-        requests = {url: request_type for url in urls}
+            batch = service.new_batch_http_request(callback=index_api)
 
-        # Set up credentials and service
-        credentials = service_account.Credentials.from_service_account_info(
-            json_key_content, scopes=["https://www.googleapis.com/auth/indexing"])
-        service = build('indexing', 'v3', credentials=credentials)
+            for url, api_type in requests.items():
+                batch.add(service.urlNotifications().publish(
+                    body={"url": url, "type": api_type}))
 
-        # Create batch request
-        batch = service.new_batch_http_request(callback=index_api)
+            if st.button("Submit URLs"):
+                with st.spinner(f"Submitting URLs for {'updating' if request_type == 'URL_UPDATED' else 'removal'}..."):
+                    batch.execute()
+                st.success("Batch request completed!")
 
-        # Add URL notifications to batch
-        for url, api_type in requests.items():
-            batch.add(service.urlNotifications().publish(
-                body={"url": url, "type": api_type}))
+    with tab2:
+        status_file = st.file_uploader("Upload a file with URLs to check status (one per line)", type="txt")
+        
+        if json_key and status_file:
+            json_key_content = json.load(json_key)
+            urls_to_check = [line.decode('utf-8').strip() for line in status_file]
 
-        # Execute batch request
-        if st.button("Submit URLs"):
-            with st.spinner(f"Submitting URLs for {'updating' if request_type == 'URL_UPDATED' else 'removal'}..."):
-                batch.execute()
-            st.success("Batch request completed!")
+            credentials = service_account.Credentials.from_service_account_info(
+                json_key_content, scopes=["https://www.googleapis.com/auth/indexing"])
+            service = build('indexing', 'v3', credentials=credentials)
+
+            if st.button("Check Status"):
+                with st.spinner("Checking URL statuses..."):
+                    statuses = get_notification_status(service, urls_to_check)
+                
+                st.subheader("Notification Statuses")
+                for url, status, time in statuses:
+                    st.write(f"URL: {url}")
+                    st.write(f"Status: {status}")
+                    st.write(f"Time: {time}")
+                    st.write("---")
 
 if __name__ == "__main__":
     main()
