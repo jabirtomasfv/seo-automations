@@ -50,7 +50,7 @@ def main():
 
         # Execute batch request
         if st.button("Submit URLs"):
-            with st.spinner(f"Submitting URLs for {'updating' if request_type == 'Update URLs' else 'removal'}..."):
+            with st.spinner(f"Submitting URLs for {'updating' if request_type == 'URL_UPDATED' else 'removal'}..."):
                 batch.execute()
             st.success("Batch request completed!")
 
