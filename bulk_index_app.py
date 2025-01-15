@@ -22,7 +22,7 @@ def main():
     request_type = st.radio("Select request type:", ("Update URLs", "Remove URLs"))
     if request_type == "Update URLs":
       request_type == "URL_UPDATED"
-    else:
+    elif request_type == "Remover URLs":
       request_type == "URL_DELETED"
 
     if json_key and url_file:
