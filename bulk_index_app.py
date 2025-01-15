@@ -20,7 +20,6 @@ def get_notification_status(service, urls):
     return statuses
 
 def main():
-    def main():
     st.title("Google Indexing API - Bulk URL Submission")
 
     json_key = st.file_uploader("Upload your service account JSON key file", type="json")
