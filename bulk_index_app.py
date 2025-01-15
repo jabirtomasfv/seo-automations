@@ -19,11 +19,7 @@ def main():
     url_file = st.file_uploader("Upload a file with URLs (one per line)", type="txt")
 
     # Request type selection
-    request_type = st.radio("Select request type:", ("Update URLs", "Remove URLs"))
-    if request_type == "Update URLs":
-      request_type == "URL_UPDATED"
-    elif request_type == "Remover URLs":
-      request_type == "URL_DELETED"
+    request_type = st.radio("Select request type:", ("URL_UPDATED", "URL_DELETED"))
 
     if json_key and url_file:
         # Read JSON key
