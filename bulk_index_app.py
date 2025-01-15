@@ -20,9 +20,21 @@ def get_notification_status(service, urls):
     return statuses
 
 def main():
-    st.title("Google Indexing API - Bulk URL Operations")
+    def main():
+    st.title("Google Indexing API - Bulk URL Submission")
 
     json_key = st.file_uploader("Upload your service account JSON key file", type="json")
+
+    if json_key:
+        try:
+            json_key_content = json.load(json_key)
+            st.success("JSON key file loaded successfully")
+        except json.JSONDecodeError as e:
+            st.error(f"Error decoding JSON: {str(e)}")
+            st.write("File content:")
+            st.write(json_key.getvalue().decode("utf-8"))
+        except Exception as e:
+            st.error(f"An error occurred: {str(e)}")
 
     tab1, tab2 = st.tabs(["Submit URLs", "Check Status"])
 
