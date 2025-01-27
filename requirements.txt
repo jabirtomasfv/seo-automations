@@ -5,3 +5,8 @@ altair>=4.0
 google-auth-oauthlib
 google-auth-httplib2
 google-api-python-client
+
+nltk
+numpy
+scikit-learn
+sentence-transformers
