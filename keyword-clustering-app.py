@@ -7,6 +7,8 @@ from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import DBSCAN
 from sentence_transformers import SentenceTransformer
 import io
+import os
+
 
 def execution():
     # Set NLTK data directory
