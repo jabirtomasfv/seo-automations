@@ -9,9 +9,15 @@ from sentence_transformers import SentenceTransformer
 import io
 
 def execution():
+    # Set NLTK data directory
+    nltk_data_dir = "/tmp/nltk_data"
+    os.environ['NLTK_DATA'] = nltk_data_dir
+    os.makedirs(nltk_data_dir, exist_ok=True)
+
+    
     # Download NLTK resources
-    nltk.download('punkt', quiet=True)
-    nltk.download('stopwords', quiet=True)
+    nltk.download('punkt', quiet=True, download_dir=nltk_data_dir)
+    nltk.download('stopwords', quiet=True, download_dir=nltk_data_dir)
 
     from nltk.corpus import stopwords
 
