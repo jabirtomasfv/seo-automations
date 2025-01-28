@@ -26,7 +26,13 @@ def execution():
 
     # Function to preprocess keywords
     def preprocess_keywords(keywords):
-        stop_words = set(stopwords.words('english'))
+        stop_words_english = set(stopwords.words('english'))
+        stop_words_spanish = set(stopwords.words('spanish'))
+        stop_words_french = set(stopwords.words('french'))
+        stop_words_german = set(stopwords.words('german'))
+        stop_words_italian = set(stopwords.words('italian'))
+        stop_words_portuguese = set(stopwords.words('portuguese'))
+        stop_words = stop_words_english.union(stop_words_spanish, stop_words_french, stop_words_german,stop_words_italian,stop_words_portuguese)
         preprocessed = []
         for keyword in keywords:
             words = nltk.word_tokenize(str(keyword).lower())
@@ -71,7 +77,7 @@ def execution():
         similarity_matrix = cosine_similarity(X)
 
         # Apply DBSCAN clustering algorithm
-        clustering_model = DBSCAN(eps=0.5, min_samples=2, metric='precomputed')
+        clustering_model = DBSCAN(eps=0.2, min_samples=2, metric='precomputed')
         distance_matrix = 1 - similarity_matrix  # Convert similarity to distance
         distance_matrix[distance_matrix < 0] = 0  # Ensure non-negative distances
         clusters = clustering_model.fit_predict(distance_matrix)
