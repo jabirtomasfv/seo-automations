@@ -94,7 +94,7 @@ if uploaded_file is not None:
                     df.at[index, 'Cluster Name'] = page
                     break
 
-        return df[["Keyword","Volume",  "KD", "CPC", "Cluster Name"]]
+        return df[["Keyword","Volume",  "KD", "CPC", "Cluster Name"]].copy()
 
     classified_keywords = classify_keywords_in_dataframe(df.copy(), classification_terms) #Second Stage of keyword clustering
 
@@ -144,7 +144,6 @@ if uploaded_file is not None:
         text = ' '.join(tokens)
         return text
 
-    #Create new variable for cluster names
     data_clusters = classified_keywords_2.copy()
     data_clusters['cleaned_keyword'] = data_clusters['Keyword'].apply(clean_text)
 
