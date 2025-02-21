@@ -21,12 +21,6 @@ try:
 except LookupError:
     st.write("Downloading punkt tokenizer...")
     nltk.download('punkt')
-# Download punkt_tab explicitly - critical fix
-try:
-    nltk.data.find('tokenizers/punkt_tab')
-except LookupError:
-    st.write("Downloading punkt_tab...")
-    nltk.download('punkt')
 
 # --- 1. Title and Introduction ---
 st.title("Keyword Clustering Tool")
