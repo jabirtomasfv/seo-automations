@@ -5,10 +5,18 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import DBSCAN
 import nltk
+
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    st.write("Downloading punkt tokenizer...")
+    nltk.download('punkt')
+    st.write("Punkt tokenizer downloaded.")
+
 from nltk.corpus import stopwords
-nltk.download('punkt')
 from nltk.tokenize import word_tokenize
 import string
+
 
 # --- 1. Title and Introduction ---
 st.title("Keyword Clustering Tool")
