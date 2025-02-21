@@ -8,5 +8,6 @@ google-api-python-client
 
 scikit-learn
 nltk
+gensim
 numpy
 sentence-transformers
