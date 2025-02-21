@@ -10,6 +10,24 @@ from nltk.tokenize import word_tokenize
 import string
 import os
 
+# --- 0. Download NLTK data at the very beginning ---
+try:
+    nltk.data.find('corpora/stopwords')
+except LookupError:
+    st.write("Downloading stopwords...")
+    nltk.download('stopwords')
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    st.write("Downloading punkt tokenizer...")
+    nltk.download('punkt')
+# Download punkt_tab explicitly - critical fix
+try:
+    nltk.data.find('tokenizers/punkt_tab')
+except LookupError:
+    st.write("Downloading punkt_tab...")
+    nltk.download('punkt')
+
 # --- 1. Title and Introduction ---
 st.title("Keyword Clustering Tool")
 st.write("Upload your CSV file containing keywords to cluster them automatically.")
@@ -60,7 +78,8 @@ if uploaded_file is not None:
         "Things to do":[
             "things to do","fun things", "stuff to do", "things to explore","things to check out","must-do activities", "things to enjoy", "things worth doing","things to discover","things not to miss", "things to keep you busy", "things to experience",
             "cool stuff to do", "places to check out","things to try", "hang out", "spend your day", "things to check out", "fun options", "things happening", "things to do near"]
-                                }
+                            }
+
 
     def classify_keywords_in_dataframe(df, classification_terms):
         """
@@ -81,28 +100,10 @@ if uploaded_file is not None:
                     df.at[index, 'Cluster Name'] = page
                     break
 
-        return df[["Keyword","Volume",	"KD",	"CPC",	"Cluster Name"]]
+        return df[["Keyword","Volume",  "KD", "CPC", "Cluster Name"]]
 
-    # Perform initial classification
-    try:
-        classified_keywords = classify_keywords_in_dataframe(df.copy(), classification_terms)  # Use df.copy()
-        st.write("Initial Classification Complete:")
-        st.dataframe(classified_keywords)
-    except Exception as e:
-        st.error(f"Error during initial classification: {e}")
-        st.stop()
+    classified_keywords = classify_keywords_in_dataframe(df.copy(), classification_terms) #Second Stage of keyword clustering
 
-    # --- 4. Keyword Clustering Stage 2: DBSCAN Clustering ---
-
-    # Download NLTK data (only if not already downloaded)
-    try:
-        nltk.data.find('corpora/stopwords')
-    except LookupError:
-        nltk.download('stopwords')
-    try:
-        nltk.data.find('tokenizers/punkt')
-    except LookupError:
-        nltk.download('punkt')
 
     from nltk.corpus import stopwords
 
@@ -121,7 +122,7 @@ if uploaded_file is not None:
             preprocessed.append(' '.join(filtered_words))
         return preprocessed
 
-    data = classified_keywords[classified_keywords['Cluster Name'] == 'Unclassified'].copy() # before it was missing .copy()
+    data = classified_keywords[classified_keywords['Cluster Name'] == 'Unclassified'].copy()
 
     keywords = data['Keyword'].tolist()
 
@@ -132,19 +133,13 @@ if uploaded_file is not None:
 
     similarity_matrix = cosine_similarity(X)
 
-    # Add a slider for epsilon
-    epsilon = st.slider("Epsilon (DBSCAN)", min_value=0.1, max_value=1.0, value=0.5, step=0.05)
-
-    # Add a slider for min_samples
-    min_samples = st.slider("Min Samples (DBSCAN)", min_value=2, max_value=10, value=2, step=1)
-
-    clustering_model = DBSCAN(eps=epsilon, min_samples=min_samples, metric='precomputed')
+    clustering_model = DBSCAN(eps=0.5, min_samples=2, metric='precomputed')
     distance_matrix = 1 - similarity_matrix
     distance_matrix[distance_matrix < 0] = 0
     clusters = clustering_model.fit_predict(distance_matrix)
 
     data['cluster'] = clusters
-    classified_keywords_2 = data[["Keyword","Volume",	"KD",	"CPC",	"cluster"]].copy() #before it was missing the .copy()
+    classified_keywords_2 = data[["Keyword","Volume",  "KD", "CPC",  "cluster"]].copy()
 
     def clean_text(text):
         text = text.lower()
@@ -155,7 +150,9 @@ if uploaded_file is not None:
         text = ' '.join(tokens)
         return text
 
-    data['cleaned_keyword'] = data['Keyword'].apply(clean_text)
+    #Create new variable for cluster names
+    data_clusters = classified_keywords_2.copy()
+    data_clusters['cleaned_keyword'] = data_clusters['Keyword'].apply(clean_text)
 
     def generate_cluster_names(df):
         cluster_names = {}
@@ -176,12 +173,10 @@ if uploaded_file is not None:
             cluster_names[cluster_id] = cluster_name
         return cluster_names
 
-    cluster_names = generate_cluster_names(data)
+    cluster_names = generate_cluster_names(data_clusters)
 
-    data['Cluster Name'] = data['cluster'].map(cluster_names)
-    classified_keywords_2 = data[["Keyword","Volume",	"KD",	"CPC",	"Cluster Name"]]
-
-    # --- 5. Merging Results ---
+    data_clusters['Cluster Name'] = data_clusters['cluster'].map(cluster_names)
+    classified_keywords_2 = data_clusters[["Keyword","Volume",  "KD", "CPC",  "Cluster Name"]].copy()
 
     merged_df = pd.concat([classified_keywords, classified_keywords_2], ignore_index=True)
 
@@ -191,8 +186,6 @@ if uploaded_file is not None:
     merged_df = merged_df.drop_duplicates(subset='Keyword', keep='last')
 
     merged_df = merged_df.reset_index(drop=True)
-
-    # --- 6. Display Final Results ---
     st.write("Final Clustered Keywords:")
     st.dataframe(merged_df)
 
@@ -204,4 +197,3 @@ if uploaded_file is not None:
         file_name='clustered_keywords.csv',
         mime='text/csv',
     )
-
