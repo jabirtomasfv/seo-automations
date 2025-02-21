@@ -5,8 +5,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import DBSCAN
 import nltk
-nltk.download('punkt')
 from nltk.corpus import stopwords
+nltk.download('punkt')
 from nltk.tokenize import word_tokenize
 import string
 
