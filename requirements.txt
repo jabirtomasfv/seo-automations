@@ -7,7 +7,7 @@ google-auth-httplib2
 google-api-python-client
 
 scikit-learn
-nltk
+nltk>=3.9.1
 gensim
 numpy
 sentence-transformers
