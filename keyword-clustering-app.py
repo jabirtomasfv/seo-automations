@@ -38,7 +38,7 @@ if uploaded_file is not None:
         st.stop()  # Stop execution if there's an error
 
     # --- 3. Keyword Clustering Stage 1: Rule-Based Classification ---
-
+language='english'
     # Define classification terms (same as in the original code)
     classification_terms = {
         "Tickets & Booking": ["fast track", "offer", "deals", "2 for ", "last minute", "ticket", "admission", "pass", "entry fee", "booking", "price", "how much", "fee", "how expensive", "cost", "fare", "availability", "charges", "discount", "ride"],
@@ -129,7 +129,7 @@ if uploaded_file is not None:
         stop_words_portuguese = set(stopwords.words('portuguese'))
         preprocessed = []
         for keyword in keywords:
-            words = nltk.word_tokenize(keyword.lower())
+            words = nltk.word_tokenize(keyword.lower()language=language)
             filtered_words = [word for word in words if word.isalnum() and word not in stop_words]
             preprocessed.append(' '.join(filtered_words))
         return preprocessed
