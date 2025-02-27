@@ -5,6 +5,27 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import DBSCAN
 import nltk
+import ssl
+
+try:
+    _create_unverified_https_context = ssl._create_unverified_context
+except AttributeError:
+    pass
+else:
+    ssl._create_default_https_context = _create_unverified_https_context
+
+# Check if punkt is already downloaded
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
+
+# Check if words is already downloaded (if you're using it)
+try:
+    nltk.data.find('corpora/words')
+except LookupError:
+    nltk.download('words')
+
 
 try:
     nltk.data.find('tokenizers/punkt')
