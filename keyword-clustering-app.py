@@ -129,7 +129,7 @@ if uploaded_file is not None:
         stop_words_portuguese = set(stopwords.words('portuguese'))
         preprocessed = []
         for keyword in keywords:
-            words = nltk.word_tokenize(keyword.lower()language=language)
+            words = nltk.word_tokenize(keyword.lower(),language=language)
             filtered_words = [word for word in words if word.isalnum() and word not in stop_words]
             preprocessed.append(' '.join(filtered_words))
         return preprocessed
