@@ -88,6 +88,8 @@ if uploaded_file is not None:
                 if any(term in keyword_lower for term in terms) and df.at[index, 'Cluster Name'] == 'Unclassified':
                     df.at[index, 'Cluster Name'] = page
                     break
+        if 'Difficulty' in df.columns:
+            df.rename(columns={'Difficulty': 'KD'}, inplace=True)
 
         return df[["Keyword","Volume",	"KD",	"CPC",	"Cluster Name"]]
 
