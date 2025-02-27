@@ -5,8 +5,10 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.cluster import DBSCAN
 import nltk
-import ssl
+import SSL
+import os
 
+# Disable SSL verification (use with caution)
 try:
     _create_unverified_https_context = ssl._create_unverified_context
 except AttributeError:
@@ -14,17 +16,26 @@ except AttributeError:
 else:
     ssl._create_default_https_context = _create_unverified_https_context
 
-# Check if punkt is already downloaded
-try:
-    nltk.data.find('tokenizers/punkt')
-except LookupError:
-    nltk.download('punkt')
+# Set a custom download directory
+nltk_data_dir = os.path.expanduser('~/nltk_data')
+os.makedirs(nltk_data_dir, exist_ok=True)
+nltk.data.path.append(nltk_data_dir)
 
-# Check if words is already downloaded (if you're using it)
-try:
-    nltk.data.find('corpora/words')
-except LookupError:
-    nltk.download('words')
+# Download required NLTK data
+def download_nltk_data():
+    try:
+        nltk.data.find('tokenizers/punkt')
+    except LookupError:
+        nltk.download('punkt', download_dir=nltk_data_dir)
+    
+    try:
+        nltk.data.find('corpora/words')
+    except LookupError:
+        nltk.download('words', download_dir=nltk_data_dir)
+
+# Call the download function
+download_nltk_data()
+
 
 
 try:
