@@ -6,7 +6,6 @@ google-auth-oauthlib
 google-auth-httplib2
 google-api-python-client
 
-scikit-learn
 nltk>=3.9.1
 gensim
 numpy
