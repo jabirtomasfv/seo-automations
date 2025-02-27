@@ -27,7 +27,7 @@ st.write("Upload your CSV file containing keywords to cluster them automatically
 
 # --- 2. File Upload ---
 uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
-
+language='english'
 if uploaded_file is not None:
     # Read the CSV into a Pandas DataFrame
     try:
@@ -38,7 +38,7 @@ if uploaded_file is not None:
         st.stop()  # Stop execution if there's an error
 
     # --- 3. Keyword Clustering Stage 1: Rule-Based Classification ---
-language='english'
+
     # Define classification terms (same as in the original code)
     classification_terms = {
         "Tickets & Booking": ["fast track", "offer", "deals", "2 for ", "last minute", "ticket", "admission", "pass", "entry fee", "booking", "price", "how much", "fee", "how expensive", "cost", "fare", "availability", "charges", "discount", "ride"],
